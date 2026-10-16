@@ -2,20 +2,26 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth, getDashboardRoute } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { RoleRoute } from './components/auth/RoleRoute';
+import { AccessDenied } from './components/auth/AccessDenied';
+
+// Public & Shared Pages
 import { HomePage } from './pages/HomePage';
 import { IdentifyPage } from './pages/IdentifyPage';
 import { SchedulePage } from './pages/SchedulePage';
-import { CitizenDashboard } from './pages/CitizenDashboard';
-import { CollectorPortal } from './pages/CollectorPortal';
-import { PartnerPortal } from './pages/PartnerPortal';
-import { OrganizationPortal } from './pages/OrganizationPortal';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { ImpactPage } from './pages/ImpactPage';
-import { AdminDashboard } from './pages/AdminDashboard';
 import { AuthPage } from './pages/AuthPage';
+
+// 5 Dedicated Role Dashboards
+import { CitizenDashboard } from './pages/CitizenDashboard';
+import { AdminDashboard } from './pages/AdminDashboard';
+import { CollectorDashboard } from './pages/CollectorDashboard';
+import { RecyclerDashboard } from './pages/RecyclerDashboard';
+import { CampusDashboard } from './pages/CampusDashboard';
 
 // Protected Route Gateway Wrapper
 const AuthGateway: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -34,7 +40,7 @@ const AuthGateway: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
   }
 
-  // If not logged in, show AuthPage first!
+  // If not logged in, gate behind AuthPage
   if (!user) {
     return <AuthPage />;
   }
@@ -48,82 +54,114 @@ export const AppContent: React.FC = () => {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-[#fbfbfa] dark:bg-[#090d16] text-gray-900 dark:text-gray-100 transition-colors duration-300">
-        {/* Only show Navbar and Footer when logged in */}
+        {/* Navigation bar visible when logged in */}
         {user && <Navbar />}
         <main className="flex-1">
           <Routes>
-            {/* If not logged in, root and all main pages are gated behind AuthPage */}
-            <Route path="/login" element={user ? <Navigate to="/" replace /> : <AuthPage />} />
-            <Route path="/register" element={user ? <Navigate to="/" replace /> : <AuthPage />} />
+            {/* Auth Page & Role-Aware Post-Login Redirect */}
+            <Route 
+              path="/login" 
+              element={user ? <Navigate to={getDashboardRoute(user.role)} replace /> : <AuthPage />} 
+            />
+            <Route 
+              path="/register" 
+              element={user ? <Navigate to={getDashboardRoute(user.role)} replace /> : <AuthPage />} 
+            />
 
+            {/* Public Showcase & Feature Routes */}
             <Route path="/" element={
               <AuthGateway>
                 <HomePage />
               </AuthGateway>
             } />
-
             <Route path="/home" element={
               <AuthGateway>
                 <HomePage />
               </AuthGateway>
             } />
-
             <Route path="/identify" element={
               <AuthGateway>
                 <IdentifyPage />
               </AuthGateway>
             } />
-
             <Route path="/schedule" element={
               <AuthGateway>
                 <SchedulePage />
               </AuthGateway>
             } />
-
-            <Route path="/dashboard" element={
-              <AuthGateway>
-                <CitizenDashboard />
-              </AuthGateway>
-            } />
-
-            <Route path="/collector" element={
-              <AuthGateway>
-                <CollectorPortal />
-              </AuthGateway>
-            } />
-
-            <Route path="/partner" element={
-              <AuthGateway>
-                <PartnerPortal />
-              </AuthGateway>
-            } />
-
-            <Route path="/organization" element={
-              <AuthGateway>
-                <OrganizationPortal />
-              </AuthGateway>
-            } />
-
             <Route path="/marketplace" element={
               <AuthGateway>
                 <MarketplacePage />
               </AuthGateway>
             } />
-
             <Route path="/impact" element={
               <AuthGateway>
                 <ImpactPage />
               </AuthGateway>
             } />
 
-            <Route path="/admin" element={
-              <AuthGateway>
-                <AdminDashboard />
-              </AuthGateway>
-            } />
+            {/* Access Denied Route */}
+            <Route path="/access-denied" element={<AccessDenied />} />
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* 1. CITIZEN DASHBOARD */}
+            <Route 
+              path="/citizen/dashboard" 
+              element={
+                <RoleRoute allowedRoles={['individual']}>
+                  <CitizenDashboard />
+                </RoleRoute>
+              } 
+            />
+
+            {/* 2. ADMIN OPS DASHBOARD */}
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <RoleRoute allowedRoles={['admin', 'super_admin']}>
+                  <AdminDashboard />
+                </RoleRoute>
+              } 
+            />
+
+            {/* 3. COLLECTOR DASHBOARD */}
+            <Route 
+              path="/collector/dashboard" 
+              element={
+                <RoleRoute allowedRoles={['collector']}>
+                  <CollectorDashboard />
+                </RoleRoute>
+              } 
+            />
+
+            {/* 4. RECYCLER DASHBOARD */}
+            <Route 
+              path="/recycler/dashboard" 
+              element={
+                <RoleRoute allowedRoles={['partner']}>
+                  <RecyclerDashboard />
+                </RoleRoute>
+              } 
+            />
+
+            {/* 5. CAMPUS — CBIT DASHBOARD */}
+            <Route 
+              path="/campus/dashboard" 
+              element={
+                <RoleRoute allowedRoles={['organization_manager']}>
+                  <CampusDashboard />
+                </RoleRoute>
+              } 
+            />
+
+            {/* Backward-Compatibility Alias Routes */}
+            <Route path="/dashboard" element={<Navigate to="/citizen/dashboard" replace />} />
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="/collector" element={<Navigate to="/collector/dashboard" replace />} />
+            <Route path="/partner" element={<Navigate to="/recycler/dashboard" replace />} />
+            <Route path="/organization" element={<Navigate to="/campus/dashboard" replace />} />
+
+            {/* Universal Fallback */}
+            <Route path="*" element={<Navigate to={user ? getDashboardRoute(user.role) : "/login"} replace />} />
           </Routes>
         </main>
         {user && <Footer />}

@@ -97,6 +97,57 @@ def login():
     }), 200
 
 
+@auth_bp.route("/demo-login", methods=["POST"])
+def demo_login():
+    data = request.get_json() or {}
+    role = data.get("role", UserRole.INDIVIDUAL)
+    email = data.get("email")
+
+    user = None
+    if email:
+        user = User.query.filter_by(email=email.strip().lower()).first()
+
+    if not user:
+        # Match standard seeded demo user by role
+        role_map = {
+            UserRole.INDIVIDUAL: "user@ecocycle.org",
+            UserRole.COLLECTOR: "collector@ecocycle.org",
+            UserRole.PARTNER: "partner@ecocycle.org",
+            UserRole.ORGANIZATION_MANAGER: "org@cbit.ac.in",
+            UserRole.ADMIN: "admin@ecocycle.org",
+            UserRole.SUPER_ADMIN: "admin@ecocycle.org",
+        }
+        target_email = role_map.get(role)
+        if target_email:
+            user = User.query.filter_by(email=target_email).first()
+
+    if not user:
+        # Fallback to any active user matching role
+        user = User.query.filter_by(role=role, is_active=True).first()
+
+    if not user:
+        user = User(
+            email=f"demo.{role}@ecocycle.org",
+            full_name=f"Demo {role.replace('_', ' ').title()}",
+            role=role,
+            is_active=True,
+            is_verified=True,
+            preferred_language="en"
+        )
+        user.set_password("password123")
+        db.session.add(user)
+        db.session.commit()
+
+    access_token = create_access_token(identity=user.id)
+    AuditService.log_event("DEMO_LOGIN", actor_user_id=user.id, target_type="user", target_id=user.id, details={"role": user.role})
+
+    return jsonify({
+        "message": f"Logged in as demo {user.role}",
+        "access_token": access_token,
+        "user": user.to_dict()
+    }), 200
+
+
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
 def get_current_profile():

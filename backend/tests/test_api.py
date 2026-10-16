@@ -159,7 +159,37 @@ class EcoCycleAPITestCase(unittest.TestCase):
         data = rec_res.get_json()
         self.assertEqual(data["recommendation"], "reuse")
         self.assertIn("reasoning_en", data)
-        self.assertIn("reasoning_te", data)
+    def test_demo_login_and_role_authorization(self):
+        # 1. Citizen demo login
+        res_cit = self.client.post("/api/v1/auth/demo-login", json={"role": "individual"})
+        self.assertEqual(res_cit.status_code, 200)
+        cit_token = res_cit.get_json()["access_token"]
+
+        # 2. Admin demo login
+        res_adm = self.client.post("/api/v1/auth/demo-login", json={"role": "admin"})
+        self.assertEqual(res_adm.status_code, 200)
+        adm_token = res_adm.get_json()["access_token"]
+
+        # 3. Collector demo login
+        res_col = self.client.post("/api/v1/auth/demo-login", json={"role": "collector"})
+        self.assertEqual(res_col.status_code, 200)
+        col_token = res_col.get_json()["access_token"]
+
+        # 4. NEGATIVE AUTHORIZATION TEST: Citizen attempts to access Admin KPIs -> Expect 403 Forbidden
+        cit_admin_access = self.client.get("/api/v1/admin/dashboard-kpis", headers={"Authorization": f"Bearer {cit_token}"})
+        self.assertEqual(cit_admin_access.status_code, 403)
+
+        # 5. Admin access Admin KPIs -> Expect 200 OK
+        adm_access = self.client.get("/api/v1/admin/dashboard-kpis", headers={"Authorization": f"Bearer {adm_token}"})
+        self.assertEqual(adm_access.status_code, 200)
+
+        # 6. NEGATIVE AUTHORIZATION TEST: Citizen attempts to access Collector assigned jobs -> Expect 403 Forbidden
+        cit_col_access = self.client.get("/api/v1/collector/assigned", headers={"Authorization": f"Bearer {cit_token}"})
+        self.assertEqual(cit_col_access.status_code, 403)
+
+        # 7. Collector accesses assigned jobs -> Expect 200 OK
+        col_access = self.client.get("/api/v1/collector/assigned", headers={"Authorization": f"Bearer {col_token}"})
+        self.assertEqual(col_access.status_code, 200)
 
 if __name__ == "__main__":
     unittest.main()

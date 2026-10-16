@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend.app.models.base import db, utc_now
 from backend.app.models.user import User, UserRole
 from backend.app.models.ewaste import EWasteRequest, RequestStatus, RequestStatusHistory
+from backend.app.models.partner import Partner, Shipment
 from backend.app.models.pickup import HandoverReceipt, CollectorRouteStop
 from backend.app.models.rewards import RewardTransaction
 from backend.app.api.auth_middleware import role_required
@@ -13,6 +14,7 @@ from backend.app.services.audit_service import AuditService
 collector_bp = Blueprint("collector", __name__)
 
 @collector_bp.route("/assigned", methods=["GET"])
+@collector_bp.route("/assigned-pickups", methods=["GET"])
 @role_required(UserRole.COLLECTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN)
 def get_assigned_pickups():
     user_id = get_jwt_identity()
@@ -188,4 +190,82 @@ def verify_handover(request_id):
         "receipt": receipt.to_dict(),
         "request": req.to_dict(),
         "points_awarded": earned_points
+    }), 201
+
+
+@collector_bp.route("/partners", methods=["GET"])
+@role_required(UserRole.COLLECTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+def get_eligible_partners():
+    partners = Partner.query.filter_by(is_verified=True).all()
+    return jsonify({"partners": [p.to_dict() for p in partners]}), 200
+
+
+@collector_bp.route("/handover-to-partner", methods=["POST"])
+@role_required(UserRole.COLLECTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+def handover_batch_to_partner():
+    collector_id = get_jwt_identity()
+    collector = User.query.get(collector_id)
+    data = request.get_json() or {}
+    partner_id = data.get("partner_id")
+    request_ids = data.get("request_ids", [])
+    vehicle_number = data.get("vehicle_number", "TS-09-EA-4122")
+    notes = data.get("notes", "Batch dispatched from collector field run.")
+
+    if not partner_id:
+        # Default to first verified partner
+        partner = Partner.query.filter_by(is_verified=True).first()
+        if partner:
+            partner_id = partner.id
+        else:
+            return jsonify({"error": "No verified partner facility found"}), 400
+
+    requests_to_handover = []
+    if request_ids:
+        requests_to_handover = EWasteRequest.query.filter(EWasteRequest.id.in_(request_ids)).all()
+    else:
+        # Take all COLLECTED requests for this collector
+        requests_to_handover = EWasteRequest.query.filter_by(
+            assigned_collector_id=collector_id,
+            status=RequestStatus.COLLECTED
+        ).all()
+
+    if not requests_to_handover:
+        return jsonify({"error": "No collected items found eligible for facility handover"}), 400
+
+    total_weight = sum([float(r.actual_weight_kg or r.estimated_weight_kg or 1.0) for r in requests_to_handover])
+    shipment_code = f"SHP-2026-{uuid.uuid4().hex[:6].upper()}"
+
+    shipment = Shipment(
+        shipment_code=shipment_code,
+        partner_id=partner_id,
+        dispatched_by_collector_id=collector_id,
+        vehicle_number=vehicle_number,
+        status="in_transit",
+        total_items_count=len(requests_to_handover),
+        total_declared_weight_kg=round(total_weight, 2),
+        actual_received_weight_kg=round(total_weight, 2)
+    )
+    db.session.add(shipment)
+    db.session.flush()
+
+    for r in requests_to_handover:
+        r.status = RequestStatus.IN_TRANSIT
+        r.receiving_partner_id = partner_id
+        hist = RequestStatusHistory(
+            request_id=r.id,
+            previous_status=RequestStatus.COLLECTED,
+            new_status=RequestStatus.IN_TRANSIT,
+            changed_by_user_id=collector_id,
+            notes=f"Dispatched in batch {shipment_code} to partner facility."
+        )
+        db.session.add(hist)
+
+    db.session.commit()
+    AuditService.log_event("SHIPMENT_DISPATCHED", actor_user_id=collector_id, target_type="shipment", target_id=shipment.id, details={"code": shipment_code, "weight": total_weight})
+
+    return jsonify({
+        "message": f"Successfully created shipment manifest {shipment_code} with {len(requests_to_handover)} items.",
+        "shipment": shipment.to_dict(),
+        "total_items": len(requests_to_handover),
+        "total_weight_kg": total_weight
     }), 201

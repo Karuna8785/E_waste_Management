@@ -196,3 +196,73 @@ def get_partner_stats():
             "partner_details": partner.to_dict() if partner else None
         }
     }), 200
+
+
+@partner_bp.route("/shipments", methods=["GET"])
+@role_required(UserRole.PARTNER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+def get_partner_shipments():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    partner = Partner.query.filter_by(user_id=user_id).first()
+
+    query = Shipment.query
+    if partner:
+        query = query.filter_by(partner_id=partner.id)
+    
+    shipments = query.order_by(Shipment.created_at.desc()).all()
+    return jsonify({"shipments": [s.to_dict() for s in shipments]}), 200
+
+
+@partner_bp.route("/shipments/<shipment_id>/receive", methods=["POST"])
+@role_required(UserRole.PARTNER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+def receive_partner_shipment(shipment_id):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    shipment = Shipment.query.get(shipment_id)
+    if not shipment:
+        return jsonify({"error": "Shipment not found"}), 404
+
+    data = request.get_json() or {}
+    status = data.get("status", "received")  # received or rejected
+    actual_weight = float(data.get("actual_received_weight_kg", shipment.total_declared_weight_kg))
+    notes = data.get("receiving_notes", "Shipment verified and admitted to facility quarantine & intake bay.")
+
+    shipment.status = status
+    shipment.actual_received_weight_kg = actual_weight
+    shipment.received_at = utc_now()
+    shipment.receiving_notes = notes
+
+    # Update associated ewaste requests
+    requests = EWasteRequest.query.filter_by(receiving_partner_id=shipment.partner_id, status=RequestStatus.IN_TRANSIT).all()
+    for req in requests:
+        req.status = RequestStatus.RECEIVED_AT_FACILITY
+        hist = RequestStatusHistory(
+            request_id=req.id,
+            previous_status=RequestStatus.IN_TRANSIT,
+            new_status=RequestStatus.RECEIVED_AT_FACILITY,
+            changed_by_user_id=user.id,
+            notes=f"Admitted at facility bay. Declared weight: {req.actual_weight_kg or req.estimated_weight_kg} kg."
+        )
+        db.session.add(hist)
+
+    db.session.commit()
+    AuditService.log_event("SHIPMENT_RECEIVED", actor_user_id=user.id, target_type="shipment", target_id=shipment.id, details={"status": status, "weight": actual_weight})
+
+    return jsonify({
+        "message": f"Shipment {shipment.shipment_code} updated to {status}",
+        "shipment": shipment.to_dict()
+    }), 200
+
+
+@partner_bp.route("/certificates", methods=["GET"])
+@role_required(UserRole.PARTNER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+def get_issued_certificates():
+    user_id = get_jwt_identity()
+    partner = Partner.query.filter_by(user_id=user_id).first()
+
+    query = ProcessingCertificate.query
+    if partner:
+        query = query.filter_by(partner_id=partner.id)
+
+    certs = query.order_by(ProcessingCertificate.issued_at.desc()).limit(100).all()
+    return jsonify({"certificates": [c.to_dict() for c in certs]}), 200

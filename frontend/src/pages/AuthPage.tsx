@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export const AuthPage: React.FC = () => {
-  const { login, register, switchRoleDemo, isLoading } = useAuth();
+  const { login, register, switchRoleDemo, getDashboardRoute, isLoading } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -60,7 +60,7 @@ export const AuthPage: React.FC = () => {
     },
     {
       role: 'organization_manager',
-      title: 'College / Corporate Campus',
+      title: 'College / Corporate Campus (CBIT)',
       subtitle: 'Bulk inventory CSV, campus drives & ESG compliance',
       icon: Building2,
       color: 'border-purple-500 text-purple-600 bg-purple-500/10'
@@ -81,7 +81,23 @@ export const AuthPage: React.FC = () => {
     if (mode === 'signin') {
       const ok = await login(email, password);
       if (ok) {
-        navigate('/');
+        // Fetch current token user or retrieve from storage
+        const token = localStorage.getItem('ecocycle_token');
+        if (token) {
+          try {
+            const res = await fetch('/api/v1/auth/me', {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const data = await res.json();
+              navigate(getDashboardRoute(data.user?.role));
+              return;
+            }
+          } catch {
+            // fallback
+          }
+        }
+        navigate('/citizen/dashboard');
       } else {
         setErrorMessage('Invalid email or password. Please verify your credentials or use a 1-click demo login below.');
       }
@@ -99,7 +115,7 @@ export const AuthPage: React.FC = () => {
         organization_name: (selectedRole === 'organization_manager' || selectedRole === 'partner') ? orgName : undefined
       });
       if (ok) {
-        navigate('/');
+        navigate(getDashboardRoute(selectedRole));
       } else {
         setErrorMessage('Registration failed. The email may already be in use.');
       }
@@ -108,8 +124,9 @@ export const AuthPage: React.FC = () => {
 
   const handleDemoSignIn = async (role: UserRole) => {
     setErrorMessage(null);
-    await switchRoleDemo(role);
-    navigate('/');
+    const loggedInUser = await switchRoleDemo(role);
+    const targetRoute = getDashboardRoute(loggedInUser?.role || role);
+    navigate(targetRoute);
   };
 
   return (

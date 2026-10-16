@@ -121,3 +121,133 @@ def manage_campaigns():
     db.session.add(new_camp)
     db.session.commit()
     return jsonify({"message": "Campaign created", "campaign": new_camp.to_dict()}), 201
+
+
+@organization_bp.route("/inventory", methods=["GET"])
+@jwt_required()
+def get_campus_inventory():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    org_id = user.organization_id if user else None
+
+    query = EWasteRequest.query
+    if org_id:
+        query = query.filter_by(organization_id=org_id)
+    else:
+        # Fallback to organization manager user
+        query = query.filter_by(user_id=user.id)
+
+    items = query.order_by(EWasteRequest.created_at.desc()).limit(150).all()
+    return jsonify({"inventory": [item.to_dict() for item in items]}), 200
+
+
+@organization_bp.route("/schedule-bulk-pickup", methods=["POST"])
+@jwt_required()
+def schedule_bulk_pickup():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    org_id = user.organization_id if user else None
+    data = request.get_json() or {}
+
+    pickup_date = data.get("pickup_date")
+    pickup_time_slot = data.get("time_slot", "10:00 - 13:00")
+    special_instructions = data.get("special_instructions", "CBIT Lab clearance - multiple computer towers & CRT monitors.")
+    department = data.get("department", "CSE Department Laboratories")
+
+    # Update all submitted items for this org to READY_FOR_PICKUP
+    items = EWasteRequest.query.filter_by(organization_id=org_id, status=RequestStatus.SUBMITTED).all()
+    if not items:
+        # If none exist, create a bulk request item
+        req_code = f"CBIT-BULK-2026-{uuid.uuid4().hex[:6].upper()}"
+        req = EWasteRequest(
+            request_code=req_code,
+            user_id=user.id,
+            organization_id=org_id,
+            device_name=f"Bulk E-Waste Collection ({department})",
+            device_description=special_instructions,
+            quantity=data.get("quantity", 25),
+            estimated_weight_kg=float(data.get("estimated_weight_kg", 320.0)),
+            pickup_address_text="Chaitanya Bharathi Institute of Technology (CBIT), Gandipet, Hyderabad - 500075",
+            pickup_date=pickup_date,
+            pickup_time_slot=pickup_time_slot,
+            status=RequestStatus.READY_FOR_PICKUP,
+            carbon_offset_kg=round(float(data.get("estimated_weight_kg", 320.0)) * 2.8, 2)
+        )
+        db.session.add(req)
+        items = [req]
+    else:
+        for item in items:
+            item.status = RequestStatus.READY_FOR_PICKUP
+            item.pickup_date = pickup_date
+            item.pickup_time_slot = pickup_time_slot
+
+    db.session.commit()
+    AuditService.log_event("CAMPUS_BULK_PICKUP_SCHEDULED", actor_user_id=user.id, target_type="organization", target_id=org_id, details={"date": pickup_date, "department": department})
+
+    return jsonify({
+        "message": f"Bulk pickup scheduled successfully for {len(items)} batches.",
+        "pickup_date": pickup_date,
+        "time_slot": pickup_time_slot
+    }), 201
+
+
+@organization_bp.route("/departments", methods=["GET"])
+@jwt_required()
+def get_campus_departments():
+    departments = [
+        {
+            "id": "dept-cse",
+            "name": "Computer Science & Engineering (CSE)",
+            "coordinator": "Dr. M. Swamy (Assoc. Professor)",
+            "active_assets": 142,
+            "submitted_kg": 420.5,
+            "drives_participated": 4,
+            "status": "active"
+        },
+        {
+            "id": "dept-ece",
+            "name": "Electronics & Communication Engineering (ECE)",
+            "coordinator": "Dr. P. Radha (Professor)",
+            "active_assets": 89,
+            "submitted_kg": 280.0,
+            "drives_participated": 3,
+            "status": "active"
+        },
+        {
+            "id": "dept-it",
+            "name": "Information Technology (IT)",
+            "coordinator": "Prof. B. Srinivas",
+            "active_assets": 76,
+            "submitted_kg": 195.0,
+            "drives_participated": 3,
+            "status": "active"
+        },
+        {
+            "id": "dept-mech",
+            "name": "Mechanical Engineering (Robotics Lab)",
+            "coordinator": "Dr. K. Ashok Kumar",
+            "active_assets": 34,
+            "submitted_kg": 140.0,
+            "drives_participated": 2,
+            "status": "active"
+        },
+        {
+            "id": "dept-admin",
+            "name": "Administration & Finance Wing",
+            "coordinator": "Sri R. V. Ramana (Registrar Office)",
+            "active_assets": 55,
+            "submitted_kg": 115.5,
+            "drives_participated": 4,
+            "status": "active"
+        },
+        {
+            "id": "dept-library",
+            "name": "Central Library Digital Resource Hub",
+            "coordinator": "Mrs. S. Lakshmi (Chief Librarian)",
+            "active_assets": 28,
+            "submitted_kg": 68.0,
+            "drives_participated": 2,
+            "status": "active"
+        }
+    ]
+    return jsonify({"departments": departments}), 200
