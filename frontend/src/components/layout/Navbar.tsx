@@ -201,23 +201,15 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* User Profile / Auth State */}
-            {user ? (
+            {user && (
               <div className="flex items-center space-x-2">
                 <button
                   onClick={logout}
-                  className="p-2 rounded-lg border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 transition-colors"
                   title="Sign Out"
                 >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => switchRoleDemo('individual')}
-                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02]"
-                >
-                  {t.nav_login}
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
                 </button>
               </div>
             )}

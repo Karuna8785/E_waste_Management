@@ -1,8 +1,17 @@
 import React from 'react';
 import { useTranslation } from '../../context/LanguageContext';
-import { Hero3DCanvas } from '../3d/Hero3DCanvas';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Cpu, Calendar, ShieldCheck, Sparkles } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Cpu, 
+  Calendar, 
+  ShieldCheck, 
+  Sparkles, 
+  Layers, 
+  CheckCircle2, 
+  Scale, 
+  Flame 
+} from 'lucide-react';
 import { ImpactMetrics } from '../../types';
 
 interface HeroSectionProps {
@@ -80,9 +89,79 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ metrics }) => {
 
           </div>
 
-          {/* Right Column: 3D Canvas */}
-          <div className="lg:col-span-5 relative w-full h-[400px] lg:h-[500px] flex items-center justify-center">
-            <Hero3DCanvas />
+          {/* Right Column: Layered Visual Graphic (Replacing 3D Earth) */}
+          <div className="lg:col-span-5 relative w-full flex items-center justify-center">
+            <div className="relative w-full max-w-lg">
+              
+              {/* Primary Visual Card with Real E-Waste Sorting Facility Photo */}
+              <div className="rounded-3xl glass-panel p-3 border border-emerald-500/30 shadow-2xl overflow-hidden group">
+                <div className="relative h-72 sm:h-80 rounded-2xl overflow-hidden bg-gray-900">
+                  <img
+                    src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
+                    alt="Electronic recycling technicians sorting circuit boards"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  
+                  {/* Status Banner */}
+                  <div className="absolute top-4 left-4 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>AI Triage Active</span>
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 block">
+                      Certified Closed-Loop Recovery
+                    </span>
+                    <h3 className="text-lg font-extrabold mt-0.5">
+                      Responsible Electronics Treatment
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Sub-card details */}
+                <div className="p-4 grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
+                    <div className="flex items-center space-x-1 font-bold">
+                      <Scale className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Certified Weights</span>
+                    </div>
+                    <span className="text-[11px] opacity-80 block mt-0.5">100% Weighbridge Audited</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-800 dark:text-cyan-300">
+                    <div className="flex items-center space-x-1 font-bold">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-cyan-600" />
+                      <span>Zero Hazardous Waste</span>
+                    </div>
+                    <span className="text-[11px] opacity-80 block mt-0.5">Safe Lead/Mercury Extraction</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating Badge 1 (Top Right) */}
+              <div className="hidden sm:flex absolute -top-5 -right-5 p-3.5 rounded-2xl glass-panel border border-emerald-500/40 shadow-xl items-center space-x-3 bg-white/95 dark:bg-charcoal-900/95 animate-bounce-slow">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-600 flex items-center justify-center">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Verified Compliance</span>
+                  <span className="text-xs font-black text-gray-900 dark:text-white">CPCB Manifest Form 6</span>
+                </div>
+              </div>
+
+              {/* Floating Badge 2 (Bottom Left) */}
+              <div className="hidden sm:flex absolute -bottom-5 -left-5 p-3.5 rounded-2xl glass-panel border border-cyan-500/40 shadow-xl items-center space-x-3 bg-white/95 dark:bg-charcoal-900/95">
+                <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-600 flex items-center justify-center">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Circular Yield</span>
+                  <span className="text-xs font-black text-gray-900 dark:text-white">85g Gold / 100kg PCB</span>
+                </div>
+              </div>
+
+            </div>
           </div>
 
         </div>
