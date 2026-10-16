@@ -1,0 +1,245 @@
+export type Language = 'en' | 'te';
+
+export const translations = {
+  en: {
+    // Navigation
+    brand: "EcoCycle AI",
+    nav_home: "Home",
+    nav_identify: "AI Scanner",
+    nav_schedule: "Schedule Pickup",
+    nav_marketplace: "Refurbished Market",
+    nav_campaigns: "Campus Drives",
+    nav_impact: "Impact Metrics",
+    nav_citizen_portal: "My Requests",
+    nav_collector_portal: "Collector Ops",
+    nav_partner_portal: "Facility Portal",
+    nav_org_portal: "Bulk & Campuses",
+    nav_admin: "Operations Center",
+    nav_login: "Sign In",
+    nav_register: "Join Platform",
+    nav_logout: "Sign Out",
+    quick_demo_login: "Switch Role Demo",
+
+    // Hero Section
+    hero_badge: "Autonomous E-Waste Circular Supply Chain",
+    hero_title: "Give Your Old Electronics a Smarter Second Life.",
+    hero_subtitle: "Don't let dead phones, laptops, or circuit boards poison landfills. Use AI computer vision to diagnose your item, schedule certified doorstep pickup, and track circular recycling into verified new raw materials.",
+    btn_identify: "Show Us Your Old Device",
+    btn_schedule: "Schedule Doorstep Pickup",
+    stat_collected: "Verified E-Waste Diverted",
+    stat_co2: "CO₂ Emissions Prevented",
+    stat_devices: "Active Hardware Handled",
+    stat_groundwater: "Liters Groundwater Saved",
+
+    // What happens journey
+    journey_title: "What Happens to Your E-Waste?",
+    journey_subtitle: "From your doorstep to zero-landfill certified recovery.",
+    step1_title: "1. AI Visual Diagnostics",
+    step1_desc: "Photograph your device. Our neural model identifies the category, detects hazards like swollen batteries, and calculates potential precious metal recovery.",
+    step2_title: "2. Certified EcoPickup",
+    step2_desc: "An authorized collector arrives with a digital scale, verifies serials/weight, and issues a tamper-proof digital handover receipt with green reward points.",
+    step3_title: "3. Circular Triage",
+    step3_desc: "Working devices receive verified refurbishment and data sanitization for low-cost resale, extending device lifespan.",
+    step4_title: "4. Material Recovery",
+    step4_desc: "End-of-life components undergo automated shredding, smelting, and hydrometallurgical extraction to recover pure copper, gold, aluminum, and polymers.",
+
+    // AI Section
+    ai_title: "Intelligent Device Classifier",
+    ai_subtitle: "Take a photo or upload an image. Our computer vision pipeline detects device class, physical condition, and component integrity.",
+    ai_upload_prompt: "Drop device photo here, or click to browse",
+    ai_upload_hint: "Supports JPEG, PNG, WebP up to 16MB. Clear top-down or front lighting recommended.",
+    ai_analyzing: "Analyzing image features with EcoCycle-Vision v1.4...",
+    ai_detected_category: "Detected Category",
+    ai_confidence: "AI Confidence",
+    ai_visual_flags: "Visual Condition Assessment",
+    ai_flag_screen: "Screen Damage / Cracks",
+    ai_flag_battery: "Battery Swelling Hazard",
+    ai_flag_casing: "Missing Enclosure / Casing",
+    ai_flag_burn: "Burn / Corrosion Traces",
+    ai_estimated_metals: "Benchmark Recovery per 100kg",
+    ai_copper: "Copper",
+    ai_plastics: "Polymers",
+    ai_aluminum: "Aluminum",
+    ai_gold: "Gold Traces",
+
+    // Questionnaire
+    questionnaire_title: "Simple Device Questions",
+    questionnaire_subtitle: "Answer a few easy questions to help our recommendation engine decide whether this item should be reused, repaired, or recycled.",
+    q_powers_on: "Does the device power on?",
+    q_screen_damaged: "Is the screen visibly cracked or non-functional?",
+    q_components_missing: "Are any internal or external parts missing?",
+    q_battery_swollen: "Is the battery swollen, bloated, or leaking?",
+    q_physically_broken: "Is the outer chassis bent or heavily shattered?",
+    q_suitable_for_reuse: "Do you believe someone else could still use this device?",
+    btn_get_recommendation: "Calculate Smart Recommendation",
+
+    // Recommendations
+    rec_reuse: "Direct Reuse / Donation",
+    rec_repair: "Refurbishment & Repair",
+    rec_recycle: "Authorized E-Waste Recycling",
+    rec_inspection: "Specialist Safety Inspection Required",
+    rec_safety_warning: "Safety Alert: Swollen battery or fire risk detected. Keep away from heat and puncturing tools.",
+
+    // Pickup & Map
+    pickup_title: "Schedule Your Free Doorstep Collection",
+    pickup_subtitle: "Choose an available date slot. An EcoCollector will arrive at your address with certified weighing equipment.",
+    pickup_address_label: "Pickup Address & Landmark",
+    pickup_slot_label: "Preferred Time Window",
+    slot_morning: "Morning (09:00 AM - 12:00 PM)",
+    slot_afternoon: "Afternoon (01:00 PM - 04:00 PM)",
+    slot_evening: "Evening (04:00 PM - 07:00 PM)",
+    pickup_date_label: "Collection Date",
+    btn_confirm_pickup: "Confirm Collection Appointment",
+    pickup_success: "Collection scheduled successfully! Your request code is",
+
+    // Lifecycle Statuses
+    status_submitted: "Request Registered",
+    status_collector_assigned: "Collector Assigned",
+    status_pickup_scheduled: "Collection Scheduled",
+    status_collected: "Collected at Doorstep",
+    status_in_transit: "In Transit to Hub",
+    status_received_at_facility: "Received at Certified Plant",
+    status_under_inspection: "Under Technical Inspection",
+    status_processing: "Refurbishment / Recycling in Progress",
+    status_completed: "Circular Recovery Completed",
+    status_cancelled: "Cancelled",
+
+    // Marketplace
+    market_title: "Refurbished Hardware Marketplace",
+    market_subtitle: "Certified, quality-tested electronics given a second life with comprehensive warranties.",
+    market_warranty: "Months Certified Warranty",
+    market_grade: "Condition Grade",
+    btn_inquire: "Request Purchase / Inquiry",
+
+    // Common
+    loading: "Loading...",
+    error_occurred: "An error occurred. Please try again.",
+    save: "Save",
+    cancel: "Cancel",
+    view_details: "View Details",
+    download_receipt: "Download Digital Handover PDF",
+    footer_tagline: "Empowering communities and circular industries to safely transform end-of-life electronics into valuable resources.",
+    telugu_switch: "తెలుగు"
+  },
+
+  te: {
+    // Navigation
+    brand: "ఎకోసైకిల్ AI",
+    nav_home: "హోమ్",
+    nav_identify: "AI స్కానర్",
+    nav_schedule: "పికప్ షెడ్యూల్",
+    nav_marketplace: "పునరుద్ధరణ మార్కెట్",
+    nav_campaigns: "క్యాంపస్ డ్రైవ్స్",
+    nav_impact: "పర్యావరణ ప్రభావం",
+    nav_citizen_portal: "నా అభ్యర్థనలు",
+    nav_collector_portal: "కలెక్టర్ విధులు",
+    nav_partner_portal: "రీసైక్లింగ్ కేంద్రం",
+    nav_org_portal: "బల్క్ & క్యాంపస్‌లు",
+    nav_admin: "నిర్వహణ కేంద్రం",
+    nav_login: "లాగిన్",
+    nav_register: "రిజిస్టర్ చేసుకోండి",
+    nav_logout: "లాగౌట్",
+    quick_demo_login: "డెమో రోల్ మార్చండి",
+
+    // Hero Section
+    hero_badge: "స్వయంప్రతిపత్త ఇ-వ్యర్థాల పునర్వినియోగ సరఫరా వ్యవస్థ",
+    hero_title: "మీ పాత ఎలక్ట్రానిక్స్ వస్తువులకు సరికొత్త జీవం ఇవ్వండి.",
+    hero_subtitle: "పాత ఫోన్లు, ల్యాప్‌టాప్‌లు లేదా సర్క్యూట్ బోర్డులను నేలలో పారవేయకండి. AI కంప్యూటర్ విజన్ ద్వారా మీ వస్తువును తనిఖీ చేసి, సురక్షిత ఇంటివద్ద సేకరణను షెడ్యూల్ చేయండి మరియు విలువైన ముడి పదార్థాల పునరుద్ధరణను ట్రాక్ చేయండి.",
+    btn_identify: "మీ పాత పరికరాన్ని చూపించండి",
+    btn_schedule: "ఇంటి వద్దే పికప్ షెడ్యూల్ చేయండి",
+    stat_collected: "సేకరించబడిన ఇ-వ్యర్థాలు",
+    stat_co2: "నివారించబడిన కర్బన ఉద్గారాలు",
+    stat_devices: "పునరుద్ధరించిన ఎలక్ట్రానిక్స్",
+    stat_groundwater: "రక్షించబడిన భూగర్భ జలాలు (లీటర్లు)",
+
+    // What happens journey
+    journey_title: "మీ ఇ-వ్యర్థాలు ఎలా ప్రాసెస్ చేయబడతాయి?",
+    journey_subtitle: "మీ ఇంటి గుమ్మం నుండి సర్టిఫైడ్ పునరుద్ధరణ వరకు పారదర్శక ప్రక్రియ.",
+    step1_title: "1. AI విశ్లేషణ",
+    step1_desc: "మీ పరికరం ఫోటో తీయండి. మా న్యూరల్ మోడల్ వర్గాన్ని గుర్తించి, బ్యాటరీ ఉబ్బడం వంటి ప్రమాదాలను పసిగట్టి, విలువైన లోహాల రికవరీని లెక్కిస్తుంది.",
+    step2_title: "2. గుర్తింపు పొందిన ఎకో-కలెక్షన్",
+    step2_desc: "అధికారిక కలెక్టర్ డిజిటల్ త్రాసుతో మీ ఇంటికి వచ్చి, బరువును సరిచూసి, ఆకుపచ్చ రివార్డ్ పాయింట్లతో కూడిన డిజిటల్ రసీదును అందిస్తారు.",
+    step3_title: "3. సరిచూసే ప్రక్రియ",
+    step3_desc: "బాగున్న పరికరాలు సాంకేతిక మరమ్మతులు మరియు డేటా ప్రక్షాళన పొంది సరసమైన ధరకు పునర్వినియోగానికి సిద్ధమవుతాయి.",
+    step4_title: "4. ముడి పదార్థాల రికవరీ",
+    step4_desc: "పనిచేయని పరికరాల నుండి ఆధునిక యంత్రాల ద్వారా రాగి, బంగారం, అల్యూమినియం మరియు ప్లాస్టిక్‌లు విడదీయబడతాయి.",
+
+    // AI Section
+    ai_title: "తెలివైన పరికర విశ్లేషణ స్కానర్",
+    ai_subtitle: "మీ పాత పరికరం ఫోటోను అప్‌లోడ్ చేయండి. మా కంప్యూటర్ విజన్ సిస్టమ్ దాని పరిస్థితిని మరియు ప్రమాదాలను తనిఖీ చేస్తుంది.",
+    ai_upload_prompt: "పరికరం ఫోటోను ఇక్కడ లాగి వదలండి లేదా క్లిక్ చేయండి",
+    ai_upload_hint: "JPEG, PNG, WebP ఫైళ్లు అనుమతించబడతాయి (16MB వరకు). మంచి కాంతిలో తీసిన ఫోటో ఉత్తమం.",
+    ai_analyzing: "చిత్ర విశేషణాలను ఎకోసైకిల్-విజన్ v1.4 తో విశ్లేషిస్తోంది...",
+    ai_detected_category: "గుర్తించిన పరికరం వర్గం",
+    ai_confidence: "AI ఖచ్చితత్వం",
+    ai_visual_flags: "భౌతిక పరిస్థితి అంచనా",
+    ai_flag_screen: "స్క్రీన్ పగిలిందా / దెబ్బతిన్నదా",
+    ai_flag_battery: "బ్యాటరీ ఉబ్బిన ప్రమాదం",
+    ai_flag_casing: "బయటి బాడీ మిస్ అయిందా",
+    ai_flag_burn: "తుప్పు లేదా కాలిపోయిన ఆనవాళ్లు",
+    ai_estimated_metals: "ప్రతి 100 కిలోలకు లభించే లోహాలు",
+    ai_copper: "రాగి (కాపర్)",
+    ai_plastics: "ప్లాస్టిక్",
+    ai_aluminum: "అల్యూమినియం",
+    ai_gold: "బంగారు అవశేషాలు",
+
+    // Questionnaire
+    questionnaire_title: "పరికరం గురించి సులువైన ప్రశ్నలు",
+    questionnaire_subtitle: "ఈ పరికరాన్ని మళ్లీ వాడవచ్చా, బాగుచేయవచ్చా లేదా రీసైక్లింగ్ చేయాలా అనేది నిర్ణయించడానికి ఈ ప్రశ్నలకు సమాధానం ఇవ్వండి.",
+    q_powers_on: "పరికరం ఆన్ అవుతుందా?",
+    q_screen_damaged: "స్క్రీన్ పగిలిందా లేదా పనిచేయడం లేదా?",
+    q_components_missing: "ఏవైనా లోపలి లేదా బయటి భాగాలు కనిపించకుండా పోయాయా?",
+    q_battery_swollen: "బ్యాటరీ ఉబ్బిందా లేదా లీక్ అవుతోందా?",
+    q_physically_broken: "పరికరం బాడీ వంగిపోయిందా లేదా విరిగిపోయిందా?",
+    q_suitable_for_reuse: "ఇతరులు ఈ పరికరాన్ని ఇంకా ఉపయోగించుకోవచ్చని మీరు భావిస్తున్నారా?",
+    btn_get_recommendation: "సిఫార్సును లెక్కించండి",
+
+    // Recommendations
+    rec_reuse: "ప్రత్యక్ష పునర్వినియోగం / దానం",
+    rec_repair: "బాగుచేసి పునరుద్ధరించడం",
+    rec_recycle: "అధికారిక ఇ-వ్యర్థాల రీసైక్లింగ్",
+    rec_inspection: "నిపుణుల ప్రత్యక్ష పరిశీలన అవసరం",
+    rec_safety_warning: "భద్రతా హెచ్చరిక: బ్యాటరీ ఉబ్బడం లేదా అగ్ని ప్రమాదం గుర్తించబడింది. వేడికి మరియు పదునైన వస్తువులకు దూరంగా ఉంచండి.",
+
+    // Pickup & Map
+    pickup_title: "ఉచిత సేకరణను షెడ్యూల్ చేయండి",
+    pickup_subtitle: "మీకు అనువైన తేదీని ఎంచుకోండి. మా ఎకో-కలెక్టర్ సరైన త్రాసుతో మీ ఇంటి వద్దకే వస్తారు.",
+    pickup_address_label: "సేకరణ చిరునామా & ల్యాండ్‌మార్క్",
+    pickup_slot_label: "అనుకూల సమయం",
+    slot_morning: "ఉదయం (09:00 AM - 12:00 PM)",
+    slot_afternoon: "మధ్యాహ్నం (01:00 PM - 04:00 PM)",
+    slot_evening: "సాయంత్రం (04:00 PM - 07:00 PM)",
+    pickup_date_label: "సేకరణ తేదీ",
+    btn_confirm_pickup: "పికప్ సమయాన్ని నిర్ధారించండి",
+    pickup_success: "పికప్ విజయవంతంగా నమోదైంది! మీ అభ్యర్థన కోడ్",
+
+    // Lifecycle Statuses
+    status_submitted: "అభ్యర్థన నమోదైంది",
+    status_collector_assigned: "కలెక్టర్ కేటాయించబడ్డారు",
+    status_pickup_scheduled: "పికప్ ఖరారైంది",
+    status_collected: "ఇంటి వద్ద సేకరించబడింది",
+    status_in_transit: "హబ్‌కు తరలిస్తున్నారు",
+    status_received_at_facility: "రీసైక్లింగ్ కేంద్రానికి చేరింది",
+    status_under_inspection: "సాంకేతిక తనిఖీ జరుగుతోంది",
+    status_processing: "రీసైక్లింగ్ / మరమ్మతు జరుగుతోంది",
+    status_completed: "పునరుద్ధరణ పూర్తయింది",
+    status_cancelled: "రద్దు చేయబడింది",
+
+    // Marketplace
+    market_title: "బాగుచేసిన ఎలక్ట్రానిక్స్ మార్కెట్",
+    market_subtitle: "నాణ్యత తనిఖీ చేయబడిన పాత ఎలక్ట్రానిక్స్ వారంటీతో తక్కువ ధరకే అందుబాటులో ఉన్నాయి.",
+    market_warranty: "నెలల గుర్తింపు పొందిన వారంటీ",
+    market_grade: "పరిస్థితి గ్రేడ్",
+    btn_inquire: "కొనుగోలు విచారణ చేయండి",
+
+    // Common
+    loading: "లోడ్ అవుతోంది...",
+    error_occurred: "లోపం సంభవించింది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+    save: "భద్రపరచండి",
+    cancel: "రద్దు చేయండి",
+    view_details: "వివరాలు చూడండి",
+    download_receipt: "డిజిటల్ రసీదు PDF డౌన్‌లోడ్",
+    footer_tagline: "పాత ఎలక్ట్రానిక్స్ వస్తువులను పర్యావరణానికి హాని కలగకుండా విలువైన వనరులుగా మార్చే బృహత్ ప్రయత్నం.",
+    telugu_switch: "English"
+  }
+};
